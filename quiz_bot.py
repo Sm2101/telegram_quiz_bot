@@ -1,5 +1,8 @@
 import os
 import pdfplumber
+import requests
+import sys
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler, filters,
@@ -83,6 +86,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.edit_message_text(f"✅ Answer received!")
     await send_next_question(query, context)
+def check_existing_instance(token):
+    url = f"https://api.telegram.org/bot{token}/getUpdates"
+    try:
+        res = requests.post(url, timeout=5)
+        if res.status_code == 409:  # Conflict
+            print("⚠️ Another instance of this bot is already running. Exiting.")
+            sys.exit(0)
+    except Exception as e:
+        print(f"⚠️ Could not verify existing instance: {e}")
+
+check_existing_instance(BOT_TOKEN)
 
 # Step 7: Run bot
 if __name__ == "__main__":
@@ -94,5 +108,6 @@ if __name__ == "__main__":
 
     print("🚀 Bot running...")
     app.run_polling()
+
 
 
