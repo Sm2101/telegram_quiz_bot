@@ -1,3 +1,4 @@
+import re
 import os
 from flask import Flask, request
 from telegram import Update
@@ -29,11 +30,29 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await file.download_to_drive(custom_path=file_path)
 
     try:
-        # Extract text from PDF (simple placeholder)
-        with pdfplumber.open(file_path) as pdf:
-            text = ""
-            for page in pdf.pages:
-                text += page.extract_text() or ""
+         def extract_questions_from_pdf(pdf_path):
+    questions = []
+    with pdfplumber.open(pdf_path) as pdf:
+        text = "\n".join(page.extract_text() for page in pdf.pages if page.extract_text())
+
+    # Split based on question numbers like Q1, Q2, etc.
+    raw_questions = re.split(r'\bQ\d+\b', text)
+    for q in raw_questions:
+        q = q.strip()
+        if len(q) < 20:
+            continue
+
+        # Extract options like (A), (B), (C), (D)
+        opts = re.findall(r'\([A-D]\).*?(?=\([A-D]\)|$)', q, re.DOTALL)
+        question_text = re.sub(r'\([A-D]\).*', '', q).strip()
+
+        if opts:
+            questions.append({
+                "question": question_text,
+                "options": opts
+            })
+
+    return questions
 
         # Basic response
         await update.message.reply_text("✅ Got your PDF! Generating quiz...")
@@ -73,3 +92,4 @@ if __name__ == "__main__":
         webhook_url=f"{APP_URL}/{TOKEN}"
     )
     app.run(host="0.0.0.0", port=PORT)
+
