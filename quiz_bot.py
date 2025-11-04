@@ -186,7 +186,7 @@ async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("📥 Downloading PDF…")
     f = await doc.get_file()
     tmp = "uploaded.pdf"
-    await f.download(custom_path=tmp)
+    await f.download_to_drive(custom_path=tmp)
     await update.message.reply_text("🔎 Parsing PDF — this may take a moment…")
     try:
         pages = extract_text_and_images_from_pdf(tmp)
@@ -331,3 +331,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
