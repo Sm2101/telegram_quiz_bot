@@ -21,4 +21,19 @@ def run_flask():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 Hello! Send me a PDF and I’ll make quiz questions from it!")
 
-async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TY
+async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    file = await update.message.document.get_file()
+    file_path = "file.pdf"
+    await file.download_to_drive(file_path)
+    await update.message.reply_text("✅ Got your PDF! (Quiz generation coming soon...)")
+
+# --- Start Everything ---
+def main():
+    Thread(target=run_flask).start()  # Start mini web server
+    app_tg = ApplicationBuilder().token(TOKEN).build()
+    app_tg.add_handler(CommandHandler("start", start))
+    app_tg.add_handler(MessageHandler(filters.Document.PDF, handle_pdf))
+    app_tg.run_polling()
+
+if __name__ == "__main__":
+    main()
