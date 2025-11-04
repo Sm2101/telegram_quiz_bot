@@ -3,23 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz Bot</title>
+  <title>QuizMaker Web</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="quiz-container">
-    <h1>Quiz Bot</h1>
-    <div id="quiz-box">
+    <h1>QuizMaker Web</h1>
+
+    <div class="upload-section">
+      <label for="fileInput" class="upload-btn">📂 Upload Questions (.csv or .json)</label>
+      <input type="file" id="fileInput" accept=".csv, .json" />
+    </div>
+
+    <div id="quiz-box" class="hidden">
+      <div id="timer">⏱ 30s</div>
       <p id="question">Loading question...</p>
       <div id="options"></div>
       <button id="next-btn">Next</button>
     </div>
+
     <div id="result-box" class="hidden">
       <h2>Quiz Finished!</h2>
       <p id="score"></p>
+      <p id="summary"></p>
       <button onclick="restartQuiz()">Restart</button>
     </div>
+
+    <div id="start-box">
+      <button id="start-btn">Start Quiz</button>
+    </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
